@@ -1,0 +1,12 @@
+$for(posts)$
+	<article class="post">
+		<h2><a href="$url$">$title$</a></h2>
+		<div class="post-meta">
+			Posted on <time pubdate datetime=$date$>$date$</time>
+			$if(author)$
+				by $author$
+			$endif$
+		</div>
+		$body$
+	</article>
+$endfor$
