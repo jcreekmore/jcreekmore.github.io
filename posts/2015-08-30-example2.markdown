@@ -15,6 +15,8 @@ mauris. Nulla est odio, posuere id ullamcorper sit amet, tincidunt vel justo.
 Curabitur placerat tincidunt varius. Nulla vulputate, ipsum eu consectetur
 mollis, dui nibh aliquam neque, at ultricies leo ligula et arcu.
 
+### Python example
+
 ~~~~~ { .python .numberLines }
 import requests
 
@@ -24,4 +26,19 @@ try:
     r = requests.get(URL)
 except ValueError as err:
     pass
+~~~~~
+
+### Rust example
+
+~~~~~ { .rust .numberLines }
+
+pub struct Server {
+    observers: Vec<Weak<RwLock<Cache>>>,
+}
+
+pub struct Cache {
+    cache: HashMap<u32, u32>,
+    obs: Arc<RwLock<Server>>,
+}
+
 ~~~~~
