@@ -1,5 +1,6 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
+import           Data.Default (def)
 import           Data.Monoid (mappend)
 import           Hakyll
 
@@ -13,9 +14,27 @@ myFeedConfiguration = FeedConfiguration
     , feedRoot          = "http://thecreekmores.org"
     }
 
+deploy :: String
+deploy = "git stash && " ++
+         "git checkout develop && " ++
+         "stack exec thecreekmores-org clean && " ++
+         "stack exec thecreekmores-org build && " ++
+         "git fetch --all && " ++
+         "git checkout -b master --track origin/master && " ++
+         "rsync -a --filter='P _site/' --filter='P _cache/' --filter='P .git/' --filter='P .gitignore' --delete-excluded _site/ . && " ++
+         "git add -A && " ++
+         "git commit -m \"Publish.\" && " ++
+         "git push origin master:master && " ++
+         "git checkout develop && " ++
+         "git branch -D master && " ++
+         "git stash pop"
+
+configuration :: Configuration
+configuration = def { deployCommand = deploy }
+
 --------------------------------------------------------------------------------
 main :: IO ()
-main = hakyll $ do
+main = hakyllWith configuration $ do
     match "images/*" $ do
         route   idRoute
         compile copyFileCompiler
