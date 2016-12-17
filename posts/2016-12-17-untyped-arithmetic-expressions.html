@@ -3,10 +3,10 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Technological Musings - Home</title>
-		<link rel="stylesheet" type="text/css" href="./css/pure-min.css">
-		<link rel="stylesheet" type="text/css" href="./css/grids-responsive-min.css">
-        <link rel="stylesheet" type="text/css" href="./css/default.css">
+        <title>Technological Musings - Untyped Arithmetic Expressions</title>
+		<link rel="stylesheet" type="text/css" href="../css/pure-min.css">
+		<link rel="stylesheet" type="text/css" href="../css/grids-responsive-min.css">
+        <link rel="stylesheet" type="text/css" href="../css/default.css">
     </head>
     <body>
 		<div id="layout" class="pure-g">
@@ -16,13 +16,13 @@
 					<nav class="nav">
 						<ul class="pure-menu-list custom-restricted-width">
 							<li class="pure-menu-item">
-								<a class="pure-menu-link" href="./">Home</a>
+								<a class="pure-menu-link" href="../">Home</a>
 							</li>
 							<li class="pure-menu-item">
-								<a class="pure-menu-link" href="./about.html">About</a>
+								<a class="pure-menu-link" href="../about.html">About</a>
 							</li>
 							<li class="pure-menu-item">
-								<a class="pure-menu-link" href="./archive.html">Archive</a>
+								<a class="pure-menu-link" href="../archive.html">Archive</a>
 							</li>
 					</nav>
 				</div>
@@ -32,19 +32,17 @@
 				<div class="posts">
 					<section class="post">
 						<header class="post-header">
-							<h2 class="post-title">Home</h2>
+							<h2 class="post-title">Untyped Arithmetic Expressions</h2>
 						</header>
 						<div class="post-description">
-							
-	<article class="post">
-		<h2><a href="./posts/2016-12-17-untyped-arithmetic-expressions.html">Untyped Arithmetic Expressions</a></h2>
-		<div class="post-meta">
-			Posted on <time pubdate datetime="December 17, 2016">December 17, 2016</time>
-			
-	            by <a class="email" href="mailto:jonathan@thecreekmores.org?subject=Untyped Arithmetic Expressions">Jonathan Creekmore</a>
-			
-		</div>
-		<p>I have recently started working my way through the excellent <em>Types and Programming Languages (TaPL)</em> by Benjamin Pierce (expect to see this name pop up a lot in the future, because I plan on working through <em>Software Foundations</em> by him as well). Since I am also a huge fan of the Rust programming language, I have started working through the programming examples in Rust.</p>
+							<div class="post-meta">
+	Posted on <time pubdate datetime="December 17, 2016">December 17, 2016</time>
+    
+	    by <a class="email" href="mailto:jonathan@thecreekmores.org?subject=Untyped Arithmetic Expressions">Jonathan Creekmore</a>
+    
+</div>
+
+<p>I have recently started working my way through the excellent <em>Types and Programming Languages (TaPL)</em> by Benjamin Pierce (expect to see this name pop up a lot in the future, because I plan on working through <em>Software Foundations</em> by him as well). Since I am also a huge fan of the Rust programming language, I have started working through the programming examples in Rust.</p>
 <p>Rust is not the best language to write little interpreters in. While it provides pattern matching, which is really essential for this task, the borrowing rules force the code to be a bit ugly at times. The first major code example in the book is an interpreter for untyped arithmetic expressions. Rust does make it fairly short, so I will reproduce it all here and then walk through bits of it to explain.</p>
 <h3 id="untyped-arithmetic-expressions">Untyped Arithmetic Expressions</h3>
 <div class="sourceCode"><table class="sourceCode rust numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
@@ -170,9 +168,6 @@
 <p>So, due to Rust’s memory management rules, we have to specify when structures are stored on the heap and when they are just stored in place. In Rust, we can do that by declaring the object to be boxed with <code>Box</code>. So, when we define the <code>Term</code> enumeration (lines 4–12), terms that have other terms embedded in them take the embedded terms as boxes. That leads us to the magic at the very first line. To be able to pattern match inside of a <code>Box</code>, we have to enable the <code>box_patterns</code> feature. I chose to also enable the <code>box_syntax</code> feature because it makes the code a bit shorter when creating boxes. Note that compiler features are not stable, so you have to compile this code with a nightly compiler to get it to build. I built it on 1.10 initially and recently rebuilt it using 1.13.</p>
 <p>The evaluation functions are mostly self-explanatory with the in-line comments I put into place. I want to make a few general comments, though. Evaluating these terms works mainly like algebraic simplification. At each step, you look at the pattern and perform the required simplification. The <code>eval1</code> function performs what is described in <em>TaPL</em> as a single-step evaluation. It does a single step in the evalution process and returns a simpler expression. Then, the <code>eval</code> function causes that simpler expression to go back through the <code>eval1</code> function again to further simplify it until it cannot be simplified any more. At that point, <code>eval1</code> will return <code>None</code>, causing the recursion to terminate and the fully simplified form to be returned as the answer.</p>
 <p>While I did not include them, I wrote several tests to verify that I was evaluating everything correctly. You can see the Cargo project (including the tests) in the <a href="https://github.com/jcreekmore/tapl/tree/master/arith">arith directory of my tapl repo on Github</a>.</p>
-	</article>
-
-
 
 						</div>
 					</section>
