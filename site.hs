@@ -21,7 +21,7 @@ deploy = "git stash && " ++
          "stack exec thecreekmores-org build && " ++
          "git fetch --all && " ++
          "git checkout -b master --track origin/master && " ++
-         "rsync -a --filter='P _site/' --filter='P _cache/' --filter='P .git/' --filter='P .gitignore' --delete-excluded _site/ . && " ++
+         "rsync -a --filter='P _site/' --filter='P _cache/' --filter='P .stack-work/' --filter='P .git/' --filter='P .gitignore' --delete-excluded _site/ . && " ++
          "git add -A && " ++
          "git commit -m \"Publish.\" && " ++
          "git push origin master:master && " ++
