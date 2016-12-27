@@ -35,6 +35,10 @@ configuration = def { deployCommand = deploy }
 --------------------------------------------------------------------------------
 main :: IO ()
 main = hakyllWith configuration $ do
+    match "CNAME" $ do
+        route   idRoute
+        compile copyFileCompiler
+
     match "images/*" $ do
         route   idRoute
         compile copyFileCompiler
