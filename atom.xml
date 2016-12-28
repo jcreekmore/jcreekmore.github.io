@@ -8,8 +8,187 @@
         <name>Jonathan Creekmore</name>
         <email>jonathan@thecreekmores.org</email>
     </author>
-    <updated>2016-12-17T00:00:00Z</updated>
+    <updated>2016-12-28T00:00:00Z</updated>
     <entry>
+    <title>Regular Expression Decoding</title>
+    <link href="http://thecreekmores.org/posts/2016-12-28-regex-decode.html" />
+    <id>http://thecreekmores.org/posts/2016-12-28-regex-decode.html</id>
+    <published>2016-12-28T00:00:00Z</published>
+    <updated>2016-12-28T00:00:00Z</updated>
+    <summary type="html"><![CDATA[<div class="post-meta">
+	Posted on <time pubdate datetime="December 28, 2016">December 28, 2016</time>
+    
+	    by <a class="email" href="mailto:jonathan@thecreekmores.org?subject=Regular Expression Decoding">Jonathan Creekmore</a>
+    
+</div>
+
+<p>Regular expressions are great. They can be a quick and easy way to extract substrings of interest from a string. I use the awesome <code>hyper</code> crate in my day job to serve up a web API and I use the <code>hyper-router</code> crate to define all of the routes for the web API using regular expressions. Often times, those regular expressions are used something like this (stub code borrowed from <a href="https://github.com/marad/hyper-router">hyper-router</a>):</p>
+<div class="sourceCode"><table class="sourceCode rust numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+</pre></td><td class="sourceCode"><pre><code class="sourceCode rust"><span class="kw">extern</span> <span class="kw">crate</span> hyper;
+<span class="kw">extern</span> <span class="kw">crate</span> hyper_router;
+<span class="kw">extern</span> <span class="kw">crate</span> regex;
+
+<span class="kw">use</span> hyper::server::{Server, Request, Response};
+<span class="kw">use</span> hyper::status::StatusCode;
+<span class="kw">use</span> hyper::uri::RequestUri;
+<span class="kw">use</span> hyper_router::{Route, RouterBuilder};
+<span class="kw">use</span> regex::Regex;
+
+<span class="kw">const</span> ENDPOINT: &amp;<span class="ot">&#39;static</span> <span class="dt">str</span> = <span class="st">r&quot;^/api/(?P&lt;mac&gt;[a-f0-9]{12})/version/(?P&lt;version&gt;[0-9]{14})&quot;</span>;
+
+<span class="kw">fn</span> get_uri(uri: &amp;RequestUri) -&gt; <span class="dt">String</span> {
+  <span class="co">// get the uri as a string</span>
+}
+
+<span class="co">// INTERESTING BIT IS HERE!!!</span>
+<span class="kw">fn</span> endpoint_handler(req: Request, res: Response) {
+  <span class="kw">let</span> uri = get_uri(&amp;req.uri);
+  <span class="kw">let</span> endpoint_regex = Regex::new(ENDPOINT).unwrap();
+  <span class="kw">let</span> captures = endpoint_regex.captures(&amp;uri).unwrap()
+  <span class="kw">let</span> mac = captures.name(<span class="st">&quot;mac&quot;</span>).unwrap();
+  <span class="kw">let</span> version_str = captures.name(<span class="st">&quot;version&quot;</span>).unwrap();
+  <span class="kw">let</span> version: <span class="dt">u64</span> = version_str.parse().unwrap();
+
+  <span class="co">// Do something with the mac and the version number</span>
+
+  res.send(b<span class="st">&quot;Hello World!&quot;</span>).unwrap();
+}
+
+<span class="kw">fn</span> main() {
+  <span class="kw">let</span> router = RouterBuilder::new()
+    .add(Route::get(ENDPOINT).using(endpoint_handler))
+    .build();
+
+  Server::http(<span class="st">&quot;0.0.0.0:8080&quot;</span>).unwrap()
+    .handle(<span class="kw">move</span> |request: Request, response: Response| {
+      <span class="kw">match</span> router.find_handler(&amp;request) {
+        <span class="cn">Ok</span>(handler) =&gt; handler(request, response),
+        <span class="cn">Err</span>(StatusCode::NotFound) =&gt; response.send(b<span class="st">&quot;not found&quot;</span>).unwrap(),
+        <span class="cn">Err</span>(_) =&gt; response.send(b<span class="st">&quot;some error&quot;</span>).unwrap()
+     }
+   }).unwrap();
+}</code></pre></td></tr></table></div>
+<p>That code isn’t too terrible, but it is ignoring a lot of error handling for extracting the mac and version strings from the regular expression, as well as error code for converting that version string to an actual number. Now, in this case, the unwraps are probably okay since:</p>
+<ul>
+<li>We had to match against the regular expression for the <code>endpoint_handler</code> to be called, so we should successfully get a captures object from applying the regex to the uri.</li>
+<li>Both mac and version will exist.</li>
+<li>The version string will be a number that fits in a u64 because of the regex.</li>
+</ul>
+<p>However, the code gets very repetitive. What if we could just do something like this?</p>
+<div class="sourceCode"><table class="sourceCode rust numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td><td class="sourceCode"><pre><code class="sourceCode rust"><span class="kw">extern</span> <span class="kw">crate</span> regex_decode;
+<span class="kw">use</span> regex_decode::decode;
+
+<span class="at">#[</span>derive<span class="at">(</span>RustcDecodable<span class="at">)]</span>
+<span class="kw">struct</span> EndpointUri {
+  mac: <span class="dt">String</span>,
+  version: <span class="dt">u64</span>,
+}
+
+<span class="kw">fn</span> endpoint_handler(req: Request, res: Response) {
+  <span class="kw">let</span> uri = get_uri(&amp;req.uri);
+  <span class="kw">let</span> endpoint_regex = Regex::new(ENDPOINT).unwrap();
+  <span class="kw">let</span> endpoint = decode::&lt;EndpointUri&gt;(&amp;endpoint_regex, &amp;uri).unwrap();
+
+  <span class="co">// Do something with the mac and the version number we got from</span>
+  <span class="co">// the endpoint...</span>
+
+  res.send(b<span class="st">&quot;Hello World!&quot;</span>).unwrap();
+}</code></pre></td></tr></table></div>
+<p>That is what the <a href="https://github.com/jcreekmore/regex-decode">regex-decode</a> crate does for you. It provides the ability to decode the named capture groups of a regular expression into a struct. Additionally, it will do type conversions from strings into other primitive types that are defined in the struct. So, in the above example, it hides away the boilerplate of extracting the named captures and the type conversion and gives you a single place to check for errors, instead of every step along the way.</p>
+<p>If defining a struct is too heavy-weight for you, just have it decode to a tuple:</p>
+<div class="sourceCode"><table class="sourceCode rust numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="sourceCode"><pre><code class="sourceCode rust"><span class="kw">extern</span> <span class="kw">crate</span> regex_decode;
+<span class="kw">use</span> regex_decode::decode;
+
+<span class="kw">fn</span> endpoint_handler(req: Request, res: Response) {
+  <span class="kw">let</span> uri = get_uri(&amp;req.uri);
+  <span class="kw">let</span> endpoint_regex = Regex::new(ENDPOINT).unwrap();
+  <span class="kw">let</span> (mac, version) = decode::&lt;(<span class="dt">String</span>, <span class="dt">u64</span>)&gt;(&amp;endpoint_regex, &amp;uri).unwrap();
+
+  <span class="co">// Do something with the mac and the version number we got from</span>
+  <span class="co">// the endpoint...</span>
+
+  res.send(b<span class="st">&quot;Hello World!&quot;</span>).unwrap();
+}</code></pre></td></tr></table></div>
+<p>In this case, we are not decoding by the names of the capture groups and are instead just grabbing the captures by position. Plus, that still gives you the type safety that the struct would give you.</p>
+<p>You should be able to use any type you want as long as it is <code>RustcDecodable</code>. However, recursive types do not make a whole lot of sense while you are parsing a regular expression, so those are not handled. Also, I have not figured out a good way to decode tuple structs yet, so the library will emit an error if you are trying to decode to a tuple struct. But, for the use case of quickly decoding to a simple struct, the crate works just fine.</p>
+]]></summary>
+</entry>
+<entry>
     <title>Untyped Arithmetic Expressions</title>
     <link href="http://thecreekmores.org/posts/2016-12-17-untyped-arithmetic-expressions.html" />
     <id>http://thecreekmores.org/posts/2016-12-17-untyped-arithmetic-expressions.html</id>
