@@ -1,4 +1,5 @@
 ---
+layout: post
 title: Untyped Arithmetic Expressions
 author: Jonathan Creekmore
 email: jonathan@thecreekmores.org
@@ -20,7 +21,8 @@ walk through bits of it to explain.
 
 ### Untyped Arithmetic Expressions
 
-~~~~~ { .rust .numberLines }
+```rust
+
 #![feature(box_syntax, box_patterns)]
 
 #[derive(Clone, Debug, PartialEq)]
@@ -82,7 +84,7 @@ pub fn eval(t: &Term) -> Option<Term> {
              .unwrap_or(t.clone()))
 }
 
-~~~~~
+```
 
 So, due to Rust's memory management rules, we have to specify when structures are stored on the heap
 and when they are just stored in place. In Rust, we can do that by declaring the object to be boxed

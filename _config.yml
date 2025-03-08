@@ -1,0 +1,24 @@
+# _config.yml
+title: "Technological Musings"
+description: "Thoughts about building software"
+author:
+  name: "Jonathan Creekmore"
+  email: "jonathan@thecreekmores.org"
+url: "http://thecreekmores.org"
+
+# Directories
+source: .
+destination: _site
+plugins_dir: _plugins
+layouts_dir: _layouts
+includes_dir: _includes
+
+# Feed settings
+plugins:
+  - jekyll-feed
+
+feed:
+  path: atom.xml
+
+kramdown:
+  syntax_highlighter: rouge

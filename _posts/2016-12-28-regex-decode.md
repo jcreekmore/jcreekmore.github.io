@@ -1,4 +1,5 @@
 ---
+layout: post
 title: Regular Expression Decoding
 author: Jonathan Creekmore
 email: jonathan@thecreekmores.org
