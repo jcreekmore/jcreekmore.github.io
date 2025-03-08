@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Thoughts on "Poltergeist""
+title: "Thoughts on \"Poltergeist\""
 date: 2009-11-06
 modified: 2009-11-06
 category: "Life in General"

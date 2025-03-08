@@ -1,6 +1,6 @@
 ---
 layout: post
-title: ""Religious Literacy" and the Importance of Education"
+title: "\"Religious Literacy\" and the Importance of Education"
 date: 2010-07-26
 modified: 2010-07-25
 category: "Books, Politics"

@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Reflections on "If&mdash;""
+title: "Reflections on \"If&mdash;\""
 date: 2010-08-09
 modified: 2010-08-07
 category: "Reflections, Inside the Engineer"

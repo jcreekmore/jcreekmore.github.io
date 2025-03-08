@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "A Review of "In Code""
+title: "A Review of \"In Code\""
 date: 2010-08-11
 modified: 2010-08-08
 category: "Books, Inside the Engineer"

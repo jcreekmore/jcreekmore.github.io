@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "What is this "hiking" thing you speak of?"
+title: "What is this \"hiking\" thing you speak of?"
 date: 2006-02-28
 modified: 2006-02-28
 category: "Wayback Machine"
