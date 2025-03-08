@@ -12,7 +12,7 @@ all of the routes for the web API using regular expressions. Often times, those
 regular expressions are used something like this (stub code borrowed from
 [hyper-router](https://github.com/marad/hyper-router)):
 
-~~~~~ { .rust .numberLines }
+```rust 
 extern crate hyper;
 extern crate hyper_router;
 extern crate regex;
@@ -58,8 +58,8 @@ fn main() {
    }).unwrap();
 }
 
-~~~~~
 
+```
 That code isn't too terrible, but it is ignoring a lot of error handling for extracting the mac and
 version strings from the regular expression, as well as error code for converting that version
 string to an actual number. Now, in this case, the unwraps are probably okay since:
@@ -71,7 +71,7 @@ we should successfully get a captures object from applying the regex to the uri.
 
 However, the code gets very repetitive. What if we could just do something like this?
 
-~~~~~ { .rust .numberLines }
+```rust
 extern crate regex_decode;
 use regex_decode::decode;
 
@@ -91,7 +91,7 @@ fn endpoint_handler(req: Request, res: Response) {
 
   res.send(b"Hello World!").unwrap();
 }
-~~~~~
+```
 
 That is what the [regex-decode](https://github.com/jcreekmore/regex-decode) crate does for you.
 It provides the ability to decode the named capture groups of a regular expression into a struct.
@@ -102,7 +102,7 @@ step along the way.
 
 If defining a struct is too heavy-weight for you, just have it decode to a tuple:
 
-~~~~~ { .rust .numberLines }
+```rust
 extern crate regex_decode;
 use regex_decode::decode;
 
@@ -116,7 +116,7 @@ fn endpoint_handler(req: Request, res: Response) {
 
   res.send(b"Hello World!").unwrap();
 }
-~~~~~
+```
 
 In this case, we are not decoding by the names of the capture groups and are instead just grabbing
 the captures by position. Plus, that still gives you the type safety that the struct would give you.
